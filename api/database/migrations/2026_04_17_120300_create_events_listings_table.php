@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('events_listings', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->foreignUuid('organiser_id')->constrained('users');
             $table->string('title');
             $table->text('description')->nullable();
@@ -39,7 +39,7 @@ return new class extends Migration
         });
 
         Schema::create('event_ticket_types', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->foreignUuid('event_id')->constrained('events_listings')->cascadeOnDelete();
             $table->string('name'); // General, VIP, Early Bird...
             $table->string('type', 30)->default('general')

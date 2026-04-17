@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StaysListing extends Model
 {
+    use HasUuids;
     use SoftDeletes;
 
     protected $fillable = [

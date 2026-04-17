@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('experiences_listings', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->foreignUuid('provider_id')->constrained('users');
             $table->string('title');
             $table->text('description')->nullable();

@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('provider_wallets', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->foreignUuid('provider_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->decimal('balance', 14, 2)->default(0.00);
             $table->decimal('on_hold', 14, 2)->default(0.00);

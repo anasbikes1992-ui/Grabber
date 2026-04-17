@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class FeatureFlag extends Model
 {
+    use HasUuids;
     protected $fillable = ['key', 'enabled', 'description'];
 
     protected $casts = ['enabled' => 'boolean'];

@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('event_tickets', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->foreignUuid('event_id')->constrained('events_listings')->cascadeOnDelete();
             $table->foreignUuid('ticket_type_id')->constrained('event_ticket_types')->cascadeOnDelete();
             $table->foreignUuid('customer_id')->constrained('users')->cascadeOnDelete();
@@ -26,7 +26,7 @@ return new class extends Migration
         });
 
         Schema::create('ticket_scans', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->foreignUuid('ticket_id')->constrained('event_tickets')->cascadeOnDelete();
             $table->foreignUuid('scanned_by')->nullable()->constrained('users')->nullOnDelete();
             $table->string('scan_type', 20)->default('entry')->comment('entry|exit|manual');

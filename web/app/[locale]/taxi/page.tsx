@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
@@ -32,6 +32,7 @@ export default function TaxiPage() {
   const [error, setError] = useState('');
 
   const categories = estimates.map((item) => item.category);
+  const effectiveSelectedCategory = selectedCategory || (categories.length > 0 ? String(categories[0].id) : '');
 
   const iconForCategory = (name: string) => {
     const n = name.toLowerCase();
@@ -53,16 +54,10 @@ export default function TaxiPage() {
     return { lat, lng };
   };
 
-  useEffect(() => {
-    if (!selectedCategory && categories.length > 0) {
-      setSelectedCategory(String(categories[0].id));
-    }
-  }, [categories, selectedCategory]);
-
   const getEstimate = async () => {
     setError('');
 
-    if (!pickup || !dropoff || !selectedCategory) {
+    if (!pickup || !dropoff || !effectiveSelectedCategory) {
       setError('Enter pickup, dropoff, and category.');
       return;
     }
@@ -99,7 +94,7 @@ export default function TaxiPage() {
 
       if (nextEstimates.length > 0) {
         setSurge(Number(nextEstimates[0].surge_multiplier) || 1.0);
-        if (!nextEstimates.some((item) => String(item.category.id) === selectedCategory)) {
+        if (!nextEstimates.some((item) => String(item.category.id) === effectiveSelectedCategory)) {
           setSelectedCategory(String(nextEstimates[0].category.id));
         }
       }
@@ -127,7 +122,7 @@ export default function TaxiPage() {
               key={String(cat.id)}
               onClick={() => setSelectedCategory(String(cat.id))}
               className={`p-4 rounded-lg font-semibold transition-all ${
-                selectedCategory === String(cat.id)
+                effectiveSelectedCategory === String(cat.id)
                   ? 'bg-amber-500 text-white shadow-lg scale-105'
                   : 'bg-white text-gray-900 border border-gray-200 hover:border-amber-300'
               }`}
@@ -190,7 +185,7 @@ export default function TaxiPage() {
                     key={categoryId}
                     onClick={() => setSelectedCategory(categoryId)}
                     className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
-                      selectedCategory === categoryId
+                      effectiveSelectedCategory === categoryId
                         ? 'bg-amber-50 border-amber-500'
                         : 'bg-gray-50 border-gray-200 hover:border-amber-300'
                     }`}

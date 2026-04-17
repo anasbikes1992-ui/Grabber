@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TaxiTrip extends Model
 {
+    use HasUuids;
     protected $table = 'taxi_trips';
 
     protected $fillable = [

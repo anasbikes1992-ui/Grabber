@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TaxiCorporateAccount extends Model
 {
+    use HasUuids;
     protected $table = 'taxi_corporate_accounts';
 
     protected $fillable = [

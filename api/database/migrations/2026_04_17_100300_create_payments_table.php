@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->uuid('booking_id')->nullable();
             $table->uuid('property_sale_id')->nullable();
             $table->uuid('subscription_id')->nullable();

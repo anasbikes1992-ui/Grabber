@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PearlPointsBalance extends Model
 {
+    use HasUuids;
     protected $fillable = [
         'user_id', 'balance', 'lifetime_earned', 'lifetime_spent', 'tier',
     ];

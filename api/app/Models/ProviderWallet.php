@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProviderWallet extends Model
 {
+    use HasUuids;
     protected $fillable = [
         'provider_id', 'balance', 'on_hold', 'lifetime_earnings',
         'lifetime_payouts', 'cash_commission_outstanding', 'is_frozen',

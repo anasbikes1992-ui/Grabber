@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TaxiCashCommissionInvoice extends Model
 {
+    use HasUuids;
     protected $table = 'taxi_cash_commission_invoices';
 
     protected $fillable = [

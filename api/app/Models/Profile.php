@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Profile extends Model
 {
+    use HasUuids;
     protected $fillable = [
         'user_id', 'full_name', 'avatar_url', 'bio', 'nic_number',
         'date_of_birth', 'gender', 'address', 'preferred_lang',

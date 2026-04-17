@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { MapPin, Star, Users, Calendar, CreditCard, Building2, Banknote, Sparkles } from 'lucide-react';
+import { MapPin, Star, Users, CreditCard, Building2, Banknote, Sparkles } from 'lucide-react';
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;

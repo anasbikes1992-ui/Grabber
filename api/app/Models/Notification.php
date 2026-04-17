@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Notification extends Model
 {
+    use HasUuids;
     protected $fillable = [
         'user_id', 'type', 'title', 'body', 'channel', 'data',
         'read_at', 'sent_at',

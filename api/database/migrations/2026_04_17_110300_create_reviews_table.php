@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reviews', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->foreignUuid('booking_id')->constrained('bookings');
             $table->foreignUuid('reviewer_id')->constrained('users');
             $table->foreignUuid('reviewee_id')->constrained('users');

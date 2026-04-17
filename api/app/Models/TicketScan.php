@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TicketScan extends Model
 {
+    use HasUuids;
     protected $table = 'ticket_scans';
 
     protected $fillable = [

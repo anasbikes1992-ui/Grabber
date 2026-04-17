@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TaxiCorporateEmployee extends Model
 {
+    use HasUuids;
     protected $table = 'taxi_corporate_employees';
 
     protected $fillable = [

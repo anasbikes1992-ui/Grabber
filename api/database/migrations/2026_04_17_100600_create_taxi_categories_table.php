@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('taxi_categories', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->string('name', 100);
             $table->text('icon_url')->nullable();
             $table->decimal('base_fare', 8, 2);

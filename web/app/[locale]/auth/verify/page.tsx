@@ -26,20 +26,17 @@ export default function VerifyOtpPage() {
     return () => clearTimeout(t);
   }, [countdown]);
 
-  // Auto-submit when all 6 digits filled
-  useEffect(() => {
-    if (digits.every((d) => d !== '')) {
-      handleVerify(digits.join(''));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [digits]);
-
   function handleInput(index: number, value: string) {
     const char = value.replace(/\D/g, '').slice(-1);
     const next = [...digits];
     next[index] = char;
     setDigits(next);
     setError('');
+
+    if (next.every((d) => d !== '')) {
+      void handleVerify(next.join(''));
+    }
+
     if (char && index < CODE_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -58,7 +55,9 @@ export default function VerifyOtpPage() {
     e.preventDefault();
     const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, CODE_LENGTH);
     if (pasted.length === CODE_LENGTH) {
-      setDigits(pasted.split(''));
+      const next = pasted.split('');
+      setDigits(next);
+      void handleVerify(next.join(''));
     }
   }
 

@@ -28,14 +28,14 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.grabber.lk';
 export default function RideTrackingPage() {
   const params = useParams();
   const rideId = params.rideId as string;
+  const hasRideId = typeof rideId === 'string' && rideId.length > 0;
 
   const [trip, setTrip] = useState<TaxiTrip | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!rideId) {
-      setLoading(false);
+    if (!hasRideId) {
       return;
     }
 
@@ -89,7 +89,15 @@ export default function RideTrackingPage() {
       active = false;
       clearInterval(timer);
     };
-  }, [rideId]);
+  }, [hasRideId, rideId]);
+
+  if (!hasRideId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">Invalid ride ID</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

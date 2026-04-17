@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/auth/otp_screen.dart';
@@ -12,6 +13,10 @@ import '../screens/stays/stays_search_screen.dart';
 import '../screens/taxi/taxi_home_screen.dart';
 import '../screens/taxi/ride_tracking_screen.dart';
 import '../screens/taxi/ride_complete_screen.dart';
+import '../screens/events/events_list_screen.dart';
+import '../screens/events/event_detail_screen.dart';
+import '../screens/experiences/experiences_list_screen.dart';
+import '../screens/experiences/experience_detail_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -70,6 +75,30 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(path: '/booking/confirmation', builder: (_, __) => const BookingConfirmationScreen()),
+      GoRoute(path: '/events', builder: (_, __) => const EventsListScreen()),
+      GoRoute(
+        path: '/events/detail',
+        builder: (_, state) {
+          final extra = (state.extra as Map?)?.cast<String, dynamic>() ?? <String, dynamic>{};
+          final eventId = extra['event_id'] as String?;
+          if (eventId == null || eventId.isEmpty) {
+            return const Scaffold(body: Center(child: Text('Invalid event ID')));
+          }
+          return EventDetailScreen(eventId: eventId);
+        },
+      ),
+      GoRoute(path: '/experiences', builder: (_, __) => const ExperiencesListScreen()),
+      GoRoute(
+        path: '/experiences/detail',
+        builder: (_, state) {
+          final extra = (state.extra as Map?)?.cast<String, dynamic>() ?? <String, dynamic>{};
+          final experienceId = extra['experience_id'] as String?;
+          if (experienceId == null || experienceId.isEmpty) {
+            return const Scaffold(body: Center(child: Text('Invalid experience ID')));
+          }
+          return ExperienceDetailScreen(experienceId: experienceId);
+        },
+      ),
       GoRoute(path: '/taxi', builder: (_, __) => const TaxiHomeScreen()),
       GoRoute(
         path: '/taxi/tracking',

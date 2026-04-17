@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('feature_flags', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->string('key', 100)->unique();
             $table->boolean('enabled')->default(false);
             $table->text('description')->nullable();

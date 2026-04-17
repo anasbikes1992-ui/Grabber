@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PlatformConfig extends Model
 {
+    use HasUuids;
     protected $fillable = ['category', 'key', 'value', 'type', 'is_sensitive'];
 
     protected $casts = ['is_sensitive' => 'boolean'];

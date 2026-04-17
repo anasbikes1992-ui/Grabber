@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('taxi_corporate_accounts', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->string('company_name', 255);
             $table->string('company_reg_no', 100)->nullable();
             $table->string('contact_name', 255);
@@ -27,7 +27,7 @@ return new class extends Migration
         });
 
         Schema::create('taxi_corporate_employees', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->foreignUuid('corporate_account_id')
                 ->constrained('taxi_corporate_accounts')->onDelete('cascade');
             $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade');
@@ -39,7 +39,7 @@ return new class extends Migration
         });
 
         Schema::create('taxi_cash_commission_invoices', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->foreignUuid('driver_id')->constrained('users')->onDelete('cascade');
             $table->date('period_start');
             $table->date('period_end');
@@ -60,7 +60,7 @@ return new class extends Migration
         });
 
         Schema::create('taxi_quests', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->string('title', 255);
             $table->text('description')->nullable();
             $table->string('type', 20)->default('daily')
@@ -79,7 +79,7 @@ return new class extends Migration
         });
 
         Schema::create('taxi_driver_quest_progress', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->foreignUuid('driver_id')->constrained('users')->onDelete('cascade');
             $table->foreignUuid('quest_id')
                 ->constrained('taxi_quests')->onDelete('cascade');

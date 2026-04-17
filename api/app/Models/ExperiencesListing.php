@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ExperiencesListing extends Model
 {
+    use HasUuids;
     use SoftDeletes;
 
     protected $table = 'experiences_listings';

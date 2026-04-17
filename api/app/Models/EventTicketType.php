@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EventTicketType extends Model
 {
+    use HasUuids;
     protected $table = 'event_ticket_types';
 
     protected $fillable = [

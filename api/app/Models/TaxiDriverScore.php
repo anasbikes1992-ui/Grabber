@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TaxiDriverScore extends Model
 {
+    use HasUuids;
     protected $table = 'taxi_driver_scores';
 
     protected $fillable = [

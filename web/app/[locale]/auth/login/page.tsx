@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
+import Link from 'next/link';
 
 type Mode = 'phone' | 'email';
 
@@ -161,9 +162,9 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
           By continuing, you agree to our{' '}
-          <a href="/terms" className="underline">Terms of Service</a>{' '}
+          <Link href="/terms" className="underline">Terms of Service</Link>{' '}
           and{' '}
-          <a href="/privacy" className="underline">Privacy Policy</a>.
+          <Link href="/privacy" className="underline">Privacy Policy</Link>.
         </p>
       </div>
     </main>

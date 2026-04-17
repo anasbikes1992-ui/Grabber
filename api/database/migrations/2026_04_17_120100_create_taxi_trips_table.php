@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('taxi_trips', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->foreignUuid('driver_id')->nullable()->constrained('users');
             $table->foreignUuid('customer_id')->constrained('users');
             $table->foreignId('taxi_category_id')->constrained('taxi_categories');

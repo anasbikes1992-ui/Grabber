@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TaxiCategory extends Model
 {
+    use HasUuids;
     protected $fillable = [
         'name', 'slug', 'icon', 'description', 'base_fare', 'per_km_rate',
         'per_min_rate', 'minimum_fare', 'surge_enabled', 'max_surge_multiplier',

@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('wallet_payout_requests', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained('users');
             $table->decimal('requested_amount', 12, 2);
             $table->decimal('payout_fee', 10, 2)->default(50);

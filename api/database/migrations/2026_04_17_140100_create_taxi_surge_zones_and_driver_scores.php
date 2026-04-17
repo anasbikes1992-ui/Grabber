@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('taxi_surge_zones', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->string('name', 100);
             $table->string('city', 100)->default('Colombo');
             $table->decimal('center_lat', 10, 7);
@@ -28,7 +28,7 @@ return new class extends Migration
         });
 
         Schema::create('taxi_driver_scores', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->foreignUuid('driver_id')->constrained('users')->onDelete('cascade');
             $table->date('period_start');
             $table->date('period_end');

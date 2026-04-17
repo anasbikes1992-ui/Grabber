@@ -10,9 +10,9 @@ class HomeScreen extends StatelessWidget {
     final cards = const [
       _ServiceCardData('Stays', Icons.hotel_rounded, Color(0xFF0F766E), '/stays/search'),
       _ServiceCardData('Vehicles', Icons.directions_car_filled_rounded, Color(0xFF1D4ED8), '/booking/confirmation'),
-      _ServiceCardData('Taxi', Icons.local_taxi_rounded, Color(0xFFB45309), '/booking/confirmation'),
-      _ServiceCardData('Events', Icons.event_available_rounded, Color(0xFFBE185D), '/booking/confirmation'),
-      _ServiceCardData('Experiences', Icons.landscape_rounded, Color(0xFF7C3AED), '/booking/confirmation'),
+      _ServiceCardData('Taxi', Icons.local_taxi_rounded, Color(0xFFB45309), '/taxi'),
+      _ServiceCardData('Events', Icons.event_available_rounded, Color(0xFFBE185D), '/events'),
+      _ServiceCardData('Experiences', Icons.landscape_rounded, Color(0xFF7C3AED), '/experiences'),
       _ServiceCardData('Wallet', Icons.account_balance_wallet_rounded, Color(0xFF334155), '/booking/confirmation'),
     ];
 
