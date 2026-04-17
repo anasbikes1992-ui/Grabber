@@ -1,9 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../models/taxi_category.dart';
 
 class TaxiService {
   static final _dio = Dio();
+  static const _storage = FlutterSecureStorage();
+  static const _tokenKey = 'grabber_token';
 
   // Set this during app init with your actual API base URL
   static String _apiBaseUrl = 'https://api.grabber-hub-lk.local/api/v1';
@@ -71,7 +74,7 @@ class TaxiService {
           'dest_address': destAddress,
           'payment_method': paymentMethod,
         },
-        options: _authOptions(),
+        options: await _authOptions(),
       );
       return res.data;
     } catch (e) {
@@ -83,7 +86,7 @@ class TaxiService {
     try {
       final res = await _dio.get(
         '$_apiBaseUrl/taxi/rides/$tripId',
-        options: _authOptions(),
+        options: await _authOptions(),
       );
       return res.data;
     } catch (e) {
@@ -96,7 +99,7 @@ class TaxiService {
       await _dio.patch(
         '$_apiBaseUrl/taxi/rides/$tripId/cancel',
         data: {'reason': reason},
-        options: _authOptions(),
+        options: await _authOptions(),
       );
     } catch (e) {
       rethrow;
@@ -111,7 +114,7 @@ class TaxiService {
           'rating': rating,
           'tip_amount': tipAmount,
         },
-        options: _authOptions(),
+        options: await _authOptions(),
       );
     } catch (e) {
       rethrow;
@@ -122,7 +125,7 @@ class TaxiService {
     try {
       await _dio.post(
         '$_apiBaseUrl/taxi/rides/$tripId/sos',
-        options: _authOptions(),
+        options: await _authOptions(),
       );
     } catch (e) {
       rethrow;
@@ -131,14 +134,16 @@ class TaxiService {
 
   // ── Helper ───────────────────────────────────────────────────────────────
 
-  static Options _authOptions() {
-    // TODO: retrieve actual token from secure storage / auth provider
-    // final token = await _secureStorage.read(key: 'auth_token');
-    return Options(
-      headers: {
-        'Authorization': 'Bearer YOUR_TOKEN_HERE',
-        'Content-Type': 'application/json',
-      },
-    );
+  static Future<Options> _authOptions() async {
+    final token = await _storage.read(key: _tokenKey);
+    final headers = <String, String>{
+      'Content-Type': 'application/json',
+    };
+
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    return Options(headers: headers);
   }
 }

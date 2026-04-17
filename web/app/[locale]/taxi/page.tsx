@@ -4,48 +4,108 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
+type TaxiCategory = {
+  id: string | number;
+  name: string;
+  base_fare?: number;
+  per_km_rate?: number;
+};
+
+type FareEstimate = {
+  category: TaxiCategory;
+  distance_km: number;
+  surge_multiplier: number;
+  total_fare: number;
+  pearl_points_earn: number;
+};
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.grabber.lk';
+
 export default function TaxiPage() {
-  const t = useTranslations();
-  const [selectedCategory, setSelectedCategory] = useState('');
+  useTranslations();
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [pickup, setPickup] = useState('');
   const [dropoff, setDropoff] = useState('');
-  const [estimates, setEstimates] = useState<any>(null);
+  const [estimates, setEstimates] = useState<FareEstimate[]>([]);
   const [loading, setLoading] = useState(false);
   const [surge, setSurge] = useState(1.0);
+  const [error, setError] = useState('');
 
-  const categories = [
-    { id: 'nano', name: 'Nano', rate: 45, icon: '🚗' },
-    { id: 'mini', name: 'Mini', rate: 55, icon: '🚙' },
-    { id: 'sedan', name: 'Sedan', rate: 75, icon: '🚗' },
-    { id: 'suv', name: 'SUV', rate: 100, icon: '🚙' },
-    { id: 'van', name: 'Van', rate: 150, icon: '🚐' },
-  ];
+  const categories = estimates.map((item) => item.category);
+
+  const iconForCategory = (name: string) => {
+    const n = name.toLowerCase();
+    if (n.includes('van')) return '🚐';
+    if (n.includes('suv') || n.includes('mini')) return '🚙';
+    return '🚗';
+  };
+
+  const parseCoords = (value: string): { lat: number; lng: number } | null => {
+    const parts = value.split(',').map((part) => part.trim());
+    if (parts.length !== 2) return null;
+
+    const lat = Number(parts[0]);
+    const lng = Number(parts[1]);
+
+    if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+
+    return { lat, lng };
+  };
 
   useEffect(() => {
-    if (categories.length > 0) {
-      setSelectedCategory(categories[0].id);
+    if (!selectedCategory && categories.length > 0) {
+      setSelectedCategory(String(categories[0].id));
     }
-  }, []);
+  }, [categories, selectedCategory]);
 
   const getEstimate = async () => {
+    setError('');
+
     if (!pickup || !dropoff || !selectedCategory) {
+      setError('Enter pickup, dropoff, and category.');
+      return;
+    }
+
+    const origin = parseCoords(pickup);
+    const destination = parseCoords(dropoff);
+
+    if (!origin || !destination) {
+      setError('Use coordinate format: lat,lng (example: 6.9271,79.8612).');
       return;
     }
 
     setLoading(true);
     try {
-      // Mock fetch — in real app, call API
-      // const res = await fetch('/api/v1/taxi/fare/all-categories?...').then(r => r.json());
-      setEstimates({
-        nano: { base: 45, distance: 12.5, total: 57.5, km: 1 },
-        mini: { base: 55, distance: 15, total: 70, km: 1 },
-        sedan: { base: 75, distance: 20, total: 95, km: 1 },
-        suv: { base: 100, distance: 26, total: 126, km: 1 },
-        van: { base: 150, distance: 39, total: 189, km: 1 },
+      const url = new URL(`${API_BASE}/api/v1/taxi/fare/all-categories`);
+      url.searchParams.set('origin_lat', String(origin.lat));
+      url.searchParams.set('origin_lng', String(origin.lng));
+      url.searchParams.set('dest_lat', String(destination.lat));
+      url.searchParams.set('dest_lng', String(destination.lng));
+
+      const res = await fetch(url.toString(), {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        cache: 'no-store',
       });
-      setSurge(1.2); // Mock surge
+
+      const json = await res.json();
+      if (!res.ok || !json?.success || !Array.isArray(json?.data)) {
+        throw new Error(json?.message ?? 'Failed to get fare estimates');
+      }
+
+      const nextEstimates = json.data as FareEstimate[];
+      setEstimates(nextEstimates);
+
+      if (nextEstimates.length > 0) {
+        setSurge(Number(nextEstimates[0].surge_multiplier) || 1.0);
+        if (!nextEstimates.some((item) => String(item.category.id) === selectedCategory)) {
+          setSelectedCategory(String(nextEstimates[0].category.id));
+        }
+      }
     } catch (e) {
-      console.error('Failed to get estimate', e);
+      const msg = e instanceof Error ? e.message : 'Failed to get estimate';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -64,17 +124,17 @@ export default function TaxiPage() {
         <div className="grid grid-cols-5 gap-3 mb-8">
           {categories.map((cat) => (
             <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
+              key={String(cat.id)}
+              onClick={() => setSelectedCategory(String(cat.id))}
               className={`p-4 rounded-lg font-semibold transition-all ${
-                selectedCategory === cat.id
+                selectedCategory === String(cat.id)
                   ? 'bg-amber-500 text-white shadow-lg scale-105'
                   : 'bg-white text-gray-900 border border-gray-200 hover:border-amber-300'
               }`}
             >
-              <div className="text-3xl mb-1">{cat.icon}</div>
+              <div className="text-3xl mb-1">{iconForCategory(cat.name)}</div>
               <div className="text-xs">{cat.name}</div>
-              <div className="text-xs font-normal text-opacity-80">LKR {cat.rate}/km</div>
+              <div className="text-xs font-normal text-opacity-80">LKR {cat.per_km_rate ?? '-'} /km</div>
             </button>
           ))}
         </div>
@@ -83,19 +143,23 @@ export default function TaxiPage() {
         <div className="space-y-4 mb-6">
           <input
             type="text"
-            placeholder="📍 Pickup location"
+            placeholder="Pickup coordinates (lat,lng)"
             value={pickup}
             onChange={(e) => setPickup(e.target.value)}
             className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           <input
             type="text"
-            placeholder="📌 Dropoff location"
+            placeholder="Dropoff coordinates (lat,lng)"
             value={dropoff}
             onChange={(e) => setDropoff(e.target.value)}
             className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
         </div>
+
+        {error && (
+          <p className="mb-4 text-sm text-red-600">{error}</p>
+        )}
 
         {/* Get estimate button */}
         <button
@@ -107,7 +171,7 @@ export default function TaxiPage() {
         </button>
 
         {/* Fare estimates panel */}
-        {estimates && (
+        {estimates.length > 0 && (
           <div className="bg-white rounded-xl p-6 mb-8 shadow-md border border-amber-200">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-bold">Fare Estimates</h2>
@@ -119,28 +183,26 @@ export default function TaxiPage() {
             </div>
 
             <div className="space-y-3">
-              {categories.map((cat) => {
-                const est = estimates[cat.id];
-                if (!est) return null;
-                const total = est.total * surge;
-                const pearlPts = Math.floor(total / 100);
+              {estimates.map((est) => {
+                const categoryId = String(est.category.id);
                 return (
                   <div
-                    key={cat.id}
+                    key={categoryId}
+                    onClick={() => setSelectedCategory(categoryId)}
                     className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
-                      selectedCategory === cat.id
+                      selectedCategory === categoryId
                         ? 'bg-amber-50 border-amber-500'
                         : 'bg-gray-50 border-gray-200 hover:border-amber-300'
                     }`}
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <div className="font-semibold">{cat.name} {cat.icon}</div>
-                        <div className="text-xs text-gray-600">~{est.km} km</div>
+                        <div className="font-semibold">{est.category.name} {iconForCategory(est.category.name)}</div>
+                        <div className="text-xs text-gray-600">~{est.distance_km} km</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-amber-600">LKR {total.toFixed(0)}</div>
-                        <div className="text-xs text-gray-500">Earn {pearlPts} Pearl Points</div>
+                        <div className="text-2xl font-bold text-amber-600">LKR {Number(est.total_fare).toFixed(0)}</div>
+                        <div className="text-xs text-gray-500">Earn {est.pearl_points_earn} Pearl Points</div>
                       </div>
                     </div>
                   </div>
@@ -163,11 +225,11 @@ export default function TaxiPage() {
           </button>
           <p className="text-center text-sm text-gray-600">
             Available on{' '}
-            <Link href="#" className="text-amber-600 font-semibold hover:underline">
+            <Link href="https://www.apple.com/app-store/" className="text-amber-600 font-semibold hover:underline" target="_blank" rel="noopener noreferrer">
               iOS
             </Link>{' '}
             and{' '}
-            <Link href="#" className="text-amber-600 font-semibold hover:underline">
+            <Link href="https://play.google.com/store" className="text-amber-600 font-semibold hover:underline" target="_blank" rel="noopener noreferrer">
               Android
             </Link>
           </p>

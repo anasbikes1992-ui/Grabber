@@ -131,7 +131,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::post('/taxi/corporate/{id}/check-credit', [TaxiCorporateController::class, 'checkCredit']);
 
     // ── Taxi Sprint 3 — Admin ─────────────────────────────────────────────────
-    Route::prefix('admin/taxi')->group(function () {
+    Route::prefix('admin/taxi')->middleware('role:admin,super_admin')->group(function () {
         Route::get('/rides', [AdminTaxiController::class, 'liveRides']);
         Route::get('/stats', [AdminTaxiController::class, 'stats']);
         Route::get('/driver-scores', [AdminTaxiController::class, 'driverScores']);

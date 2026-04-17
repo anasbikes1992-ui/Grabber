@@ -100,8 +100,8 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
     setState(() => _isUpdatingLocation = true);
     try {
       await TaxiDriverService.updateLocation(
-        latitude: _currentPosition!.latitude,
-        longitude: _currentPosition!.longitude,
+        lat: _currentPosition!.latitude,
+        lng: _currentPosition!.longitude,
       );
     } catch (_) {
     } finally {

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CspHeadersMiddleware;
+use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\OtpRateLimitMiddleware;
 use App\Http\Middleware\SecurityHeadersMiddleware;
 use App\Http\Middleware\VerifyWebxPaySignatureMiddleware;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'otp.rate_limit' => OtpRateLimitMiddleware::class,
+            'role' => EnsureUserHasRole::class,
             'webxpay.signature' => VerifyWebxPaySignatureMiddleware::class,
         ]);
     })

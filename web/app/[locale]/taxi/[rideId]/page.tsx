@@ -3,45 +3,92 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 
+type TripProfile = {
+  name?: string;
+};
+
+type TripParty = {
+  profile?: TripProfile;
+};
+
+type TaxiTrip = {
+  id: string;
+  status: string;
+  origin_address?: string;
+  dest_address?: string;
+  final_fare?: number;
+  estimated_fare?: number;
+  distance_km?: number;
+  driver?: TripParty & { driver_rating?: number };
+  customer?: TripParty;
+};
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.grabber.lk';
+
 export default function RideTrackingPage() {
   const params = useParams();
   const rideId = params.rideId as string;
 
-  const [trip, setTrip] = useState<any>(null);
+  const [trip, setTrip] = useState<TaxiTrip | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchTrip = async () => {
+    if (!rideId) {
+      setLoading(false);
+      return;
+    }
+
+    let active = true;
+
+    const fetchTrip = async (isInitial = false) => {
       try {
-        // In real app: const res = await fetch(`/api/v1/taxi/rides/${rideId}`);
-        // Mock response
-        setTrip({
-          id: rideId,
-          status: 'in_transit',
-          origin_address: '123 Main Street, Colombo',
-          dest_address: '456 Galle Road, Colombo',
-          fare: 550,
-          distance_km: 8.5,
-          driver: {
-            profile: { name: 'Rajeev Kumar' },
-            driver_rating: 4.8,
-            current_lat: 6.9271,
-            current_lng: 79.8612,
-          },
-          customer: {
-            profile: { name: 'Customer' },
-          },
+        const token = typeof window !== 'undefined' ? localStorage.getItem('grabber_token') : null;
+        const headers: Record<string, string> = {
+          Accept: 'application/json',
+        };
+
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+
+        const res = await fetch(`${API_BASE}/api/v1/taxi/rides/${rideId}`, {
+          method: 'GET',
+          headers,
+          cache: 'no-store',
         });
+
+        const json = await res.json();
+        if (!res.ok || !json?.trip) {
+          throw new Error(json?.message ?? 'Unable to load trip');
+        }
+
+        if (!active) return;
+        setTrip(json.trip as TaxiTrip);
+        setError('');
       } catch (e) {
-        console.error('Failed to fetch trip', e);
+        if (!active) return;
+        const message = e instanceof Error ? e.message : 'Failed to fetch trip';
+        setError(message);
+        if (isInitial) {
+          setTrip(null);
+        }
       } finally {
-        setLoading(false);
+        if (active && isInitial) {
+          setLoading(false);
+        }
       }
     };
 
-    if (rideId) {
-      fetchTrip();
-    }
+    fetchTrip(true);
+    const timer = setInterval(() => {
+      fetchTrip(false);
+    }, 5000);
+
+    return () => {
+      active = false;
+      clearInterval(timer);
+    };
   }, [rideId]);
 
   if (loading) {
@@ -55,7 +102,7 @@ export default function RideTrackingPage() {
   if (!trip) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Ride not found</p>
+        <p className="text-gray-600">{error || 'Ride not found'}</p>
       </div>
     );
   }
@@ -79,10 +126,12 @@ export default function RideTrackingPage() {
           </p>
         </div>
 
-        {/* Map placeholder */}
-        <div className="bg-gray-300 rounded-lg h-64 mb-6 flex items-center justify-center text-gray-600">
-          🗺️ OpenStreetMap would appear here
+        {/* Map section */}
+        <div className="bg-gray-300 rounded-lg h-64 mb-6 flex items-center justify-center text-gray-700 text-sm px-4 text-center">
+          Live map integration depends on driver location stream. Trip updates are refreshing every 5 seconds.
         </div>
+
+        {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
         {/* Driver info */}
         <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
@@ -121,7 +170,7 @@ export default function RideTrackingPage() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Estimated Fare</span>
-              <span className="text-2xl font-bold text-amber-600">LKR {trip.fare}</span>
+              <span className="text-2xl font-bold text-amber-600">LKR {trip.final_fare ?? trip.estimated_fare ?? 0}</span>
             </div>
           </div>
         </div>
