@@ -13,7 +13,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('driver_id')->nullable()->constrained('users');
             $table->foreignUuid('customer_id')->constrained('users');
-            $table->foreignId('taxi_category_id')->constrained('taxi_categories');
+            $table->foreignUuid('taxi_category_id')->constrained('taxi_categories');
             $table->string('status', 30)->default('searching')
                 ->comment('scheduled|searching|accepted|driver_arrived|in_transit|completing|completed|cancelled|sos');
             $table->decimal('origin_lat', 10, 7);

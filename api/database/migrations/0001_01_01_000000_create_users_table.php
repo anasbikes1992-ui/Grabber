@@ -21,9 +21,9 @@ return new class extends Migration
             $table->timestampTz('two_factor_confirmed_at')->nullable();
             $table->timestampTz('last_login_at')->nullable();
             $table->timestampsTz();
-
-            $table->check("role in ('customer','provider_stays','provider_vehicles','provider_events','provider_experiences','provider_properties','property_broker','provider_sme','driver','cash_agent','admin','super_admin')");
         });
+
+        DB::statement("ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('customer','provider_stays','provider_vehicles','provider_events','provider_experiences','provider_properties','property_broker','provider_sme','driver','cash_agent','admin','super_admin'))");
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();

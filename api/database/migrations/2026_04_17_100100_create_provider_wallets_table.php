@@ -21,9 +21,9 @@ return new class extends Migration
             $table->boolean('is_frozen')->default(false);
             $table->unsignedInteger('payout_hold_days')->default(3);
             $table->timestampTz('updated_at')->useCurrent();
-
-            $table->check('balance >= 0');
         });
+
+        DB::statement('ALTER TABLE provider_wallets ADD CONSTRAINT provider_wallets_balance_chk CHECK (balance >= 0)');
     }
 
     public function down(): void

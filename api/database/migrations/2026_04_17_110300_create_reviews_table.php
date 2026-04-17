@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -18,12 +19,13 @@ return new class extends Migration
             $table->text('comment')->nullable();
             $table->jsonb('category_ratings')->nullable(); // cleanliness, accuracy, value, etc.
             $table->boolean('is_public')->default(true);
-            $table->string('direction')
-                ->check("direction IN ('customer_to_provider','provider_to_customer')");
+            $table->string('direction');
             $table->timestampsTz();
 
             $table->unique(['booking_id', 'reviewer_id', 'direction']);
         });
+
+        DB::statement("ALTER TABLE reviews ADD CONSTRAINT reviews_direction_chk CHECK (direction IN ('customer_to_provider','provider_to_customer'))");
     }
 
     public function down(): void

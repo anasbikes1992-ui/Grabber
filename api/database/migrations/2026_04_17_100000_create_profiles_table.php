@@ -40,11 +40,11 @@ return new class extends Migration
             $table->boolean('accepts_cash')->default(false);
             $table->boolean('cash_security_deposit_paid')->default(false);
             $table->timestampsTz();
-
-            $table->check("provider_tier in ('standard','verified','pro','elite')");
-            $table->check("account_status in ('active','suspended','banned')");
-            $table->check("social_tier in ('standard','premium')");
         });
+
+        DB::statement("ALTER TABLE profiles ADD CONSTRAINT profiles_provider_tier_chk CHECK (provider_tier IN ('standard','verified','pro','elite'))");
+        DB::statement("ALTER TABLE profiles ADD CONSTRAINT profiles_account_status_chk CHECK (account_status IN ('active','suspended','banned'))");
+        DB::statement("ALTER TABLE profiles ADD CONSTRAINT profiles_social_tier_chk CHECK (social_tier IN ('standard','premium'))");
     }
 
     public function down(): void

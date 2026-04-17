@@ -38,11 +38,11 @@ return new class extends Migration
             $table->timestampTz('created_at')->useCurrent();
 
             $table->index(['status', 'bank_transfer_deadline']);
-
-            $table->check("payment_method in ('card','bank_transfer','cash_agent','cash_provider')");
-            $table->check("type in ('booking','deposit','property_commission','subscription','flash_deal_listing','cash_security_deposit')");
-            $table->check("status in ('pending','awaiting_bank_transfer','awaiting_cash','completed','failed','refunded','partially_refunded')");
         });
+
+        DB::statement("ALTER TABLE payments ADD CONSTRAINT payments_payment_method_chk CHECK (payment_method IN ('card','bank_transfer','cash_agent','cash_provider'))");
+        DB::statement("ALTER TABLE payments ADD CONSTRAINT payments_type_chk CHECK (type IN ('booking','deposit','property_commission','subscription','flash_deal_listing','cash_security_deposit'))");
+        DB::statement("ALTER TABLE payments ADD CONSTRAINT payments_status_chk CHECK (status IN ('pending','awaiting_bank_transfer','awaiting_cash','completed','failed','refunded','partially_refunded'))");
     }
 
     public function down(): void

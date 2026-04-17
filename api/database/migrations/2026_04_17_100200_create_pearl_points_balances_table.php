@@ -17,9 +17,9 @@ return new class extends Migration
             $table->integer('lifetime_spent')->default(0);
             $table->string('tier', 20)->default('standard');
             $table->timestampTz('updated_at')->useCurrent();
-
-            $table->check('balance >= 0');
         });
+
+        DB::statement('ALTER TABLE pearl_points_balances ADD CONSTRAINT pearl_points_balances_balance_chk CHECK (balance >= 0)');
     }
 
     public function down(): void

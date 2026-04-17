@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -25,8 +26,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('bathrooms')->default(1);
             $table->jsonb('amenities')->nullable();
             $table->jsonb('images')->nullable();
-            $table->string('status')->default('draft')
-                ->check("status IN ('draft','pending_review','active','paused','rejected','archived')");
+            $table->string('status')->default('draft');
             $table->decimal('rating_avg', 3, 2)->nullable();
             $table->unsignedInteger('review_count')->default(0);
             $table->boolean('instant_book')->default(false);
@@ -35,6 +35,8 @@ return new class extends Migration
             $table->timestampsTz();
             $table->softDeletesTz();
         });
+
+        DB::statement("ALTER TABLE stays_listings ADD CONSTRAINT stays_listings_status_chk CHECK (status IN ('draft','pending_review','active','paused','rejected','archived'))");
     }
 
     public function down(): void
