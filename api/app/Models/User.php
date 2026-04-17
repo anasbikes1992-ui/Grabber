@@ -23,6 +23,7 @@ class User extends Authenticatable
         'is_active',
         'phone_verified_at',
         'email_verified_at',
+        'referred_by',
     ];
 
     protected $hidden = [
@@ -38,5 +39,52 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
+    }
+
+    // ─── Relationships ────────────────────────────────────────────────────────
+
+    public function profile(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Profile::class);
+    }
+
+    public function wallet(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ProviderWallet::class);
+    }
+
+    public function pearlPoints(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(PearlPointsBalance::class);
+    }
+
+    public function staysListings(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(StaysListing::class, 'host_id');
+    }
+
+    public function vehicleListings(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(VehicleListing::class, 'owner_id');
+    }
+
+    public function bookingsAsCustomer(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Booking::class, 'customer_id');
+    }
+
+    public function bookingsAsProvider(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Booking::class, 'provider_id');
+    }
+
+    public function notifications(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function referrer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'referred_by');
     }
 }
