@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\TaxiFareController;
 use App\Http\Controllers\Api\V1\TaxiRideController;
 use App\Http\Controllers\Api\V1\WalletController;
 use App\Http\Controllers\Api\V1\EventsListingController;
+use App\Http\Controllers\Api\V1\EventTicketController;
 use App\Http\Controllers\Api\V1\ExperiencesListingController;
 
 // ─── Health (unauthenticated) ─────────────────────────────────────────────────
@@ -156,6 +157,9 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::put('/events/{id}', [EventsListingController::class, 'update']);
     Route::delete('/events/{id}', [EventsListingController::class, 'destroy']);
     Route::patch('/events/{id}/publish', [EventsListingController::class, 'publish']);
+    Route::post('/events/{id}/tickets/purchase', [EventTicketController::class, 'purchase']);
+    Route::get('/events/tickets/{ticketCode}', [EventTicketController::class, 'show']);
+    Route::post('/events/tickets/{ticketCode}/scan', [EventTicketController::class, 'scan']);
 
     // ── Experiences (provider write) ──────────────────────────────────────────
     Route::get('/experiences/mine', [ExperiencesListingController::class, 'mine']);

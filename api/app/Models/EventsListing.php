@@ -52,4 +52,9 @@ class EventsListing extends Model
     {
         return $this->hasMany(EventTicketType::class, 'event_id');
     }
+
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(EventTicket::class, 'event_id');
+    }
 }
