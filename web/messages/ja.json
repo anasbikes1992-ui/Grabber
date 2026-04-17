@@ -1,0 +1,10 @@
+{
+  "app": {
+    "title": "Grabber",
+    "tagline": "Mobility and marketplace platform"
+  },
+  "home": {
+    "headline": "日本語の初期設定が完了しました",
+    "subhead": "Sprint 0 internationalization baseline is ready."
+  }
+}

@@ -1,0 +1,32 @@
+name: grabber_shared
+description: Shared package for Grabber customer, provider, and admin apps.
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  supabase_flutter: ^2.5.0
+  dio: ^5.4.3
+  flutter_secure_storage: ^9.2.2
+  riverpod: ^2.5.1
+  flutter_riverpod: ^2.5.1
+  go_router: ^14.2.7
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+  hive_flutter: ^1.1.0
+  connectivity_plus: ^6.0.3
+  firebase_messaging: ^15.0.0
+  flutter_local_notifications: ^17.0.0
+  image_picker: ^1.1.2
+  url_launcher: ^6.3.0
+  share_plus: ^9.0.0
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.11
+  freezed: ^2.5.2
+  json_serializable: ^6.8.0

@@ -1,0 +1,10 @@
+{
+  "app": {
+    "title": "Grabber",
+    "tagline": "Mobility and marketplace platform"
+  },
+  "home": {
+    "headline": "إعداد اللغة العربية جاهز",
+    "subhead": "Sprint 0 internationalization baseline is ready."
+  }
+}

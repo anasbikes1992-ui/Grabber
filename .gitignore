@@ -1,0 +1,30 @@
+﻿# Laravel
+api/vendor/
+api/.env
+api/storage/logs/*
+api/storage/framework/cache/*
+
+# Next.js
+web/.next/
+web/node_modules/
+web/.env.local
+
+# Flutter
+flutter/**/build/
+flutter/**/.dart_tool/
+flutter/**/android/local.properties
+flutter/**/.flutter-plugins*
+
+# Supabase
+supabase/.env.local
+supabase/functions/.env
+
+# General
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+supabase/.branches/
+supabase/.temp/
+*.g.dart
+*.freezed.dart
