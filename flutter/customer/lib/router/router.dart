@@ -9,6 +9,9 @@ import '../screens/home/home_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/stays/stay_detail_screen.dart';
 import '../screens/stays/stays_search_screen.dart';
+import '../screens/taxi/taxi_home_screen.dart';
+import '../screens/taxi/ride_tracking_screen.dart';
+import '../screens/taxi/ride_complete_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -67,6 +70,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(path: '/booking/confirmation', builder: (_, __) => const BookingConfirmationScreen()),
+      GoRoute(path: '/taxi', builder: (_, __) => const TaxiHomeScreen()),
+      GoRoute(
+        path: '/taxi/tracking',
+        builder: (_, state) {
+          final rideId = state.extra as String? ?? '';
+          return RideTrackingScreen(rideId: rideId);
+        },
+      ),
+      GoRoute(
+        path: '/taxi/complete',
+        builder: (_, state) {
+          final rideId = state.extra as String? ?? '';
+          return RideCompleteScreen(rideId: rideId);
+        },
+      ),
     ],
   );
 });

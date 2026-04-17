@@ -3,6 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'screens/driver_home_screen.dart';
+import 'screens/incoming_ride_sheet.dart';
+import 'screens/active_ride_screen.dart';
+import 'screens/cash_commission_screen.dart';
+import 'screens/quests_screen.dart';
+import 'theme/theme.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -12,27 +19,43 @@ void main() async {
 final _router = GoRouter(
   initialLocation: '/home',
   routes: [
+    GoRoute(path: '/home', builder: (_, __) => const DriverHomeScreen()),
     GoRoute(
-      path: '/home',
-      builder: (_, __) => const Scaffold(
-        body: Center(child: Text('Provider Dashboard — Coming Soon')),
-      ),
+      path: '/ride/incoming',
+      builder: (_, state) {
+        final extra = (state.extra as Map?)?.cast<String, dynamic>() ?? <String, dynamic>{};
+        return IncomingRideSheet(
+          rideId: extra['ride_id'] as String? ?? '',
+          pickupAddress: extra['pickup_address'] as String? ?? '',
+          dropoffAddress: extra['dropoff_address'] as String? ?? '',
+          estimatedFare: (extra['estimated_fare'] as num?)?.toDouble() ?? 0,
+          distance: (extra['distance'] as num?)?.toDouble() ?? 0,
+        );
+      },
     ),
+    GoRoute(
+      path: '/ride/active',
+      builder: (_, state) {
+        final rideId = state.extra as String? ?? '';
+        return ActiveRideScreen(rideId: rideId);
+      },
+    ),
+    GoRoute(path: '/commission', builder: (_, __) => const CashCommissionScreen()),
+    GoRoute(path: '/quests', builder: (_, __) => const QuestsScreen()),
   ],
 );
 
-class ProviderApp extends StatelessWidget {
+class ProviderApp extends ConsumerWidget {
   const ProviderApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
-      title: 'Grabber Provider',
+      title: 'Grabber Hub LK — Provider',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1B6CA8)),
-      ),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: ThemeMode.system,
       routerConfig: _router,
     );
   }

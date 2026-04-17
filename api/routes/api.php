@@ -8,7 +8,12 @@ use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\StaysListingController;
 use App\Http\Controllers\Api\V1\VehicleListingController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\AdminTaxiController;
 use App\Http\Controllers\Api\V1\TaxiController;
+use App\Http\Controllers\Api\V1\TaxiCorporateController;
+use App\Http\Controllers\Api\V1\TaxiDriverController;
+use App\Http\Controllers\Api\V1\TaxiFareController;
+use App\Http\Controllers\Api\V1\TaxiRideController;
 use App\Http\Controllers\Api\V1\WalletController;
 use App\Http\Controllers\Api\V1\EventsListingController;
 use App\Http\Controllers\Api\V1\ExperiencesListingController;
@@ -50,6 +55,8 @@ Route::prefix('v1')->group(function () {
     // Taxi categories & fare estimate (public)
     Route::get('/taxi/categories', [TaxiController::class, 'categories']);
     Route::get('/taxi/estimate', [TaxiController::class, 'estimate']);
+    Route::get('/taxi/fare/estimate', [TaxiFareController::class, 'estimate']);
+    Route::get('/taxi/fare/all-categories', [TaxiFareController::class, 'allCategories']);
 });
 
 // ─── Authenticated endpoints ──────────────────────────────────────────────────
@@ -90,11 +97,53 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markRead']);
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
 
-    // ── Taxi ──────────────────────────────────────────────────────────────────
+    // ── Taxi (legacy Sprint 2) ────────────────────────────────────────────────
     Route::post('/taxi/rides', [TaxiController::class, 'requestRide']);
     Route::get('/taxi/active', [TaxiController::class, 'activeRide']);
     Route::get('/taxi/rides', [TaxiController::class, 'history']);
     Route::patch('/taxi/rides/{id}/status', [TaxiController::class, 'updateStatus']);
+
+    // ── Taxi Sprint 3 — Customer Ride Lifecycle ────────────────────────────────
+    Route::post('/taxi/rides/request', [TaxiRideController::class, 'request']);
+    Route::get('/taxi/rides/{id}', [TaxiRideController::class, 'show']);
+    Route::patch('/taxi/rides/{id}/cancel', [TaxiRideController::class, 'cancel']);
+    Route::post('/taxi/rides/{id}/rate', [TaxiRideController::class, 'rate']);
+    Route::post('/taxi/rides/{id}/sos', [TaxiRideController::class, 'sos']);
+    Route::post('/taxi/rides/{id}/split-fare', [TaxiRideController::class, 'splitFare']);
+
+    // ── Taxi Sprint 3 — Driver Actions ─────────────────────────────────────────
+    Route::post('/taxi/driver/status', [TaxiDriverController::class, 'setStatus']);
+    Route::post('/taxi/driver/location', [TaxiDriverController::class, 'updateLocation']);
+    Route::post('/taxi/driver/rides/{id}/accept', [TaxiDriverController::class, 'accept']);
+    Route::post('/taxi/driver/rides/{id}/arrive', [TaxiDriverController::class, 'arrive']);
+    Route::post('/taxi/driver/rides/{id}/start', [TaxiDriverController::class, 'startRide']);
+    Route::post('/taxi/driver/rides/{id}/complete', [TaxiDriverController::class, 'complete']);
+    Route::get('/taxi/driver/quests', [TaxiDriverController::class, 'quests']);
+    Route::get('/taxi/driver/commission-invoices', [TaxiDriverController::class, 'commissionInvoices']);
+
+    // ── Taxi Sprint 3 — Corporate Accounts ────────────────────────────────────
+    Route::get('/taxi/corporate', [TaxiCorporateController::class, 'index']);
+    Route::post('/taxi/corporate', [TaxiCorporateController::class, 'store']);
+    Route::get('/taxi/corporate/{id}', [TaxiCorporateController::class, 'show']);
+    Route::put('/taxi/corporate/{id}', [TaxiCorporateController::class, 'update']);
+    Route::post('/taxi/corporate/{id}/employees', [TaxiCorporateController::class, 'addEmployee']);
+    Route::delete('/taxi/corporate/{id}/employees/{userId}', [TaxiCorporateController::class, 'removeEmployee']);
+    Route::post('/taxi/corporate/{id}/check-credit', [TaxiCorporateController::class, 'checkCredit']);
+
+    // ── Taxi Sprint 3 — Admin ─────────────────────────────────────────────────
+    Route::prefix('admin/taxi')->group(function () {
+        Route::get('/rides', [AdminTaxiController::class, 'liveRides']);
+        Route::get('/stats', [AdminTaxiController::class, 'stats']);
+        Route::get('/driver-scores', [AdminTaxiController::class, 'driverScores']);
+        Route::get('/surge-zones', [AdminTaxiController::class, 'surgeZones']);
+        Route::post('/surge-zones/{id}/override', [AdminTaxiController::class, 'setSurgeOverride']);
+        Route::delete('/surge-zones/{id}/override', [AdminTaxiController::class, 'clearSurgeOverride']);
+        Route::get('/quests', [AdminTaxiController::class, 'quests']);
+        Route::post('/quests', [AdminTaxiController::class, 'createQuest']);
+        Route::get('/corporate-accounts', [AdminTaxiController::class, 'corporateAccounts']);
+        Route::get('/cash-commission-invoices', [AdminTaxiController::class, 'cashCommissionInvoices']);
+        Route::post('/cash-commission-invoices/{id}/mark-paid', [AdminTaxiController::class, 'markInvoicePaid']);
+    });
 
     // ── Wallet (provider) ─────────────────────────────────────────────────────
     Route::get('/wallet', [WalletController::class, 'balance']);
