@@ -8,6 +8,10 @@ use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\StaysListingController;
 use App\Http\Controllers\Api\V1\VehicleListingController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\TaxiController;
+use App\Http\Controllers\Api\V1\WalletController;
+use App\Http\Controllers\Api\V1\EventsListingController;
+use App\Http\Controllers\Api\V1\ExperiencesListingController;
 
 // ─── Health (unauthenticated) ─────────────────────────────────────────────────
 Route::get('/v1/health', function () {
@@ -27,9 +31,9 @@ Route::prefix('v1/auth')->group(function () {
 });
 
 // ─── WebxPay Webhook (no auth — signature verified by middleware) ─────────────
-Route::post('/v1/payments/webhook', [PaymentController::class, 'webhook'])
+Route::post('/v1/payments/callback', [PaymentController::class, 'callback'])
     ->middleware('webxpay.signature')
-    ->name('api.payments.webhook');
+    ->name('api.payments.callback');
 
 // ─── Public listing endpoints ─────────────────────────────────────────────────
 Route::prefix('v1')->group(function () {
@@ -38,6 +42,14 @@ Route::prefix('v1')->group(function () {
     Route::get('/vehicles', [VehicleListingController::class, 'index']);
     Route::get('/vehicles/{id}', [VehicleListingController::class, 'show']);
     Route::get('/reviews', [ReviewController::class, 'index']);
+    // Events & Experiences — public browse
+    Route::get('/events', [EventsListingController::class, 'index']);
+    Route::get('/events/{id}', [EventsListingController::class, 'show']);
+    Route::get('/experiences', [ExperiencesListingController::class, 'index']);
+    Route::get('/experiences/{id}', [ExperiencesListingController::class, 'show']);
+    // Taxi categories & fare estimate (public)
+    Route::get('/taxi/categories', [TaxiController::class, 'categories']);
+    Route::get('/taxi/estimate', [TaxiController::class, 'estimate']);
 });
 
 // ─── Authenticated endpoints ──────────────────────────────────────────────────
@@ -68,6 +80,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     // ── Payments ──────────────────────────────────────────────────────────────
     Route::post('/payments/initiate', [PaymentController::class, 'initiate']);
     Route::post('/payments/confirm-bank-transfer', [PaymentController::class, 'confirmBankTransfer']);
+    Route::post('/payments/confirm-cash-receipt', [PaymentController::class, 'confirmCashReceipt']);
 
     // ── Reviews ───────────────────────────────────────────────────────────────
     Route::post('/reviews', [ReviewController::class, 'store']);
@@ -76,4 +89,28 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markRead']);
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
+
+    // ── Taxi ──────────────────────────────────────────────────────────────────
+    Route::post('/taxi/rides', [TaxiController::class, 'requestRide']);
+    Route::get('/taxi/active', [TaxiController::class, 'activeRide']);
+    Route::get('/taxi/rides', [TaxiController::class, 'history']);
+    Route::patch('/taxi/rides/{id}/status', [TaxiController::class, 'updateStatus']);
+
+    // ── Wallet (provider) ─────────────────────────────────────────────────────
+    Route::get('/wallet', [WalletController::class, 'balance']);
+    Route::get('/wallet/history', [WalletController::class, 'history']);
+    Route::post('/wallet/payout', [WalletController::class, 'requestPayout']);
+
+    // ── Events (organiser write) ──────────────────────────────────────────────
+    Route::get('/events/mine', [EventsListingController::class, 'mine']);
+    Route::post('/events', [EventsListingController::class, 'store']);
+    Route::put('/events/{id}', [EventsListingController::class, 'update']);
+    Route::delete('/events/{id}', [EventsListingController::class, 'destroy']);
+    Route::patch('/events/{id}/publish', [EventsListingController::class, 'publish']);
+
+    // ── Experiences (provider write) ──────────────────────────────────────────
+    Route::get('/experiences/mine', [ExperiencesListingController::class, 'mine']);
+    Route::post('/experiences', [ExperiencesListingController::class, 'store']);
+    Route::put('/experiences/{id}', [ExperiencesListingController::class, 'update']);
+    Route::delete('/experiences/{id}', [ExperiencesListingController::class, 'destroy']);
 });

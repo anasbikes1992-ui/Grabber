@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 
 type Mode = 'phone' | 'email';
 
 export default function LoginPage() {
   const router = useRouter();
+  const locale = useLocale();
   const [mode, setMode] = useState<Mode>('phone');
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
@@ -55,7 +57,7 @@ export default function LoginPage() {
         identifier: input.trim(),
         identifier_type: mode,
       });
-      router.push(`/auth/verify?${params.toString()}`);
+      router.push(`/${locale}/auth/verify?${params.toString()}`);
     } catch {
       setError('Network error. Please check your connection.');
     } finally {
@@ -114,20 +116,37 @@ export default function LoginPage() {
           >
             {mode === 'phone' ? 'Phone number' : 'Email address'}
           </label>
-          <input
-            id="identifier"
-            type={mode === 'phone' ? 'tel' : 'email'}
-            value={input}
-            onChange={(e) => { setInput(e.target.value); setError(''); }}
-            placeholder={mode === 'phone' ? '+94 77 123 4567' : 'you@example.com'}
-            className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition
-              bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-              placeholder:text-gray-400
-              ${error ? 'border-red-500 focus:ring-1 focus:ring-red-500' : 'border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#1B6CA8]'}
-            `}
-            autoFocus
-            autoComplete={mode === 'phone' ? 'tel' : 'email'}
-          />
+          {mode === 'phone' ? (
+            <input
+              id="identifier"
+              type="tel"
+              value={input}
+              onChange={(e) => { setInput(e.target.value); setError(''); }}
+              placeholder="+94 77 123 4567"
+              className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                placeholder:text-gray-400
+                ${error ? 'border-red-500 focus:ring-1 focus:ring-red-500' : 'border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#1B6CA8]'}
+              `}
+              autoFocus
+              autoComplete="tel"
+            />
+          ) : (
+            <input
+              id="identifier"
+              type="email"
+              value={input}
+              onChange={(e) => { setInput(e.target.value); setError(''); }}
+              placeholder="you@example.com"
+              className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                placeholder:text-gray-400
+                ${error ? 'border-red-500 focus:ring-1 focus:ring-red-500' : 'border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#1B6CA8]'}
+              `}
+              autoFocus
+              autoComplete="email"
+            />
+          )}
           {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
 
           <button

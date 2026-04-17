@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:grabber_shared/shared.dart';
 
-class OtpScreen extends StatefulWidget {
+class OtpScreen extends ConsumerStatefulWidget {
   final String identifier;
   final String identifierType; // 'phone' | 'email'
   final bool isNewUser;
@@ -16,10 +18,10 @@ class OtpScreen extends StatefulWidget {
   });
 
   @override
-  State<OtpScreen> createState() => _OtpScreenState();
+  ConsumerState<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
+class _OtpScreenState extends ConsumerState<OtpScreen> {
   final List<TextEditingController> _controllers =
       List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
@@ -81,13 +83,27 @@ class _OtpScreenState extends State<OtpScreen> {
     if (code.length < 6) return;
 
     setState(() => _isLoading = true);
-    // TODO: call OtpRepository.verifyOtp(widget.identifier, widget.identifierType, code)
-    await Future.delayed(const Duration(seconds: 1)); // placeholder
+
+    late final Map<String, dynamic> payload;
+    try {
+      payload = await ref.read(authServiceProvider).verifyOtp(
+            identifier: widget.identifier,
+            identifierType: widget.identifierType,
+            code: code,
+          );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Verification failed: $error')),
+      );
+      return;
+    }
 
     if (!mounted) return;
     setState(() => _isLoading = false);
 
-    if (widget.isNewUser) {
+    if ((payload['is_new'] as bool?) ?? widget.isNewUser) {
       context.go('/register', extra: {
         'identifier': widget.identifier,
         'identifier_type': widget.identifierType,
@@ -99,7 +115,19 @@ class _OtpScreenState extends State<OtpScreen> {
 
   Future<void> _resendOtp() async {
     if (_resendCountdown > 0) return;
-    // TODO: call OtpRepository.sendOtp(widget.identifier, widget.identifierType)
+    try {
+      await ref.read(authServiceProvider).sendOtp(
+            identifier: widget.identifier,
+            identifierType: widget.identifierType,
+          );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to resend OTP: $error')),
+      );
+      return;
+    }
+
     _startResendTimer();
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(

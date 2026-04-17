@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 
 const CODE_LENGTH = 6;
 
 export default function VerifyOtpPage() {
   const router = useRouter();
+  const locale = useLocale();
   const params = useSearchParams();
   const identifier = params.get('identifier') ?? '';
   const identifierType = params.get('identifier_type') ?? 'phone';
@@ -90,13 +92,13 @@ export default function VerifyOtpPage() {
           identifier,
           identifier_type: identifierType,
         });
-        router.push(`/auth/register?${p.toString()}`);
+        router.push(`/${locale}/auth/register?${p.toString()}`);
       } else {
         // Store token and redirect
         if (typeof window !== 'undefined') {
           localStorage.setItem('grabber_token', json.data.token);
         }
-        router.push('/dashboard');
+        router.push(`/${locale}/dashboard`);
       }
     } catch {
       setError('Network error. Please try again.');
@@ -156,6 +158,7 @@ export default function VerifyOtpPage() {
               key={i}
               ref={(el) => { inputRefs.current[i] = el; }}
               type="text"
+              aria-label={`Verification digit ${i + 1}`}
               inputMode="numeric"
               maxLength={1}
               value={digit}

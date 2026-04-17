@@ -1,5 +1,4 @@
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+library grabber_shared;
+
+export 'services/api_service.dart';
+export 'services/auth_service.dart';

@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ProviderWallet extends Model
 {
     protected $fillable = [
-        'user_id', 'balance', 'on_hold', 'lifetime_earnings',
+        'provider_id', 'balance', 'on_hold', 'lifetime_earnings',
         'lifetime_payouts', 'cash_commission_outstanding', 'is_frozen',
-        'payout_hold_days',
+        'payout_hold_days', 'currency',
     ];
 
     protected $casts = [
@@ -24,7 +24,7 @@ class ProviderWallet extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'provider_id');
     }
 
     public function credit(float $amount, string $description = ''): void

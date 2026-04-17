@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class EventTicketType extends Model
+{
+    protected $table = 'event_ticket_types';
+
+    protected $fillable = [
+        'event_id',
+        'name',
+        'type',
+        'price',
+        'quantity',
+        'sold',
+        'sale_starts_at',
+        'sale_ends_at',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'price'          => 'float',
+        'is_active'      => 'boolean',
+        'sale_starts_at' => 'datetime',
+        'sale_ends_at'   => 'datetime',
+    ];
+
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(EventsListing::class, 'event_id');
+    }
+}

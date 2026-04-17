@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:grabber_shared/shared.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _inputController = TextEditingController();
 
@@ -28,8 +30,19 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
-    // TODO: call OtpRepository.sendOtp(identifier, identifierType)
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      await ref.read(authServiceProvider).sendOtp(
+            identifier: _inputController.text.trim(),
+            identifierType: _mode,
+          );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send OTP: $error')),
+      );
+      return;
+    }
 
     if (!mounted) return;
     setState(() => _isLoading = false);

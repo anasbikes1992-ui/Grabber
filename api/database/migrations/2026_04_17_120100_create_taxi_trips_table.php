@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -10,7 +11,7 @@ return new class extends Migration
     {
         Schema::create('taxi_trips', function (Blueprint $table) {
             $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
-            $table->foreignUuid('driver_id')->constrained('users');
+            $table->foreignUuid('driver_id')->nullable()->constrained('users');
             $table->foreignUuid('customer_id')->constrained('users');
             $table->foreignId('taxi_category_id')->constrained('taxi_categories');
             $table->string('status', 30)->default('searching')
